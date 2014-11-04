@@ -15,7 +15,9 @@ class ImagrUser(AbstractBaseUser):
     identifier = models.CharField(max_length=40, unique=True, default='')
     USERNAME_FIELD = 'identifier'
     following = models.ManyToManyField("self", related_name='followers',
-                                       verbose_name='Following Users')
+                                       verbose_name='Following Users',
+                                       blank=True,
+                                       null=True)
 
 
 class Photo(models.Model):
@@ -24,10 +26,10 @@ class Photo(models.Model):
         return self.title
 
     title = models.CharField(max_length=140)
-    description = models.CharField(max_length=2000)
+    description = models.CharField(max_length=2000, blank=True)
     date_uploaded = models.DateTimeField('date uploaded')
-    date_modified = models.DateTimeField('date modified')
-    date_published = models.DateTimeField('date published')
+    date_modified = models.DateTimeField('date modified', blank=True)
+    date_published = models.DateTimeField('date published', blank=True)
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of photo",
                               related_name='photos')
@@ -39,13 +41,13 @@ class Album(models.Model):
         return self.title
 
     title = models.CharField(max_length=140)
-    description = models.CharField(max_length=2000)
+    description = models.CharField(max_length=2000, blank=True)
     date_uploaded = models.DateTimeField('date uploaded')
-    date_modified = models.DateTimeField('date modified')
-    date_published = models.DateTimeField('date published')
+    date_modified = models.DateTimeField('date modified', blank=True)
+    date_published = models.DateTimeField('date published', blank=True)
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of album")
-    cover_photo = models.ForeignKey(Photo, related_name="cover_photo")
+    cover_photo = models.ForeignKey(Photo, related_name="cover_photo", blank=True)
     photos = models.ManyToManyField(Photo, verbose_name="photos in album",
                                     #limit_choices_to={'owner': owner},
                                     blank=True,
