@@ -12,21 +12,32 @@ PUBLISHED_CHOICES = (
 
 
 class ImagrUser(AbstractBaseUser):
-    identifier = models.CharField(max_length=40, unique=True)
+    identifier = models.CharField(max_length=40, unique=True, default='')
     USERNAME_FIELD = 'identifier'
+    following = models.ManyToManyField("self", related_name='followers',
+                                       verbose_name='Following Users')
 
 
 class Photo(models.Model):
+
+    def __unicode__(self):
+        return self.title
+
     title = models.CharField(max_length=140)
     description = models.CharField(max_length=2000)
     date_uploaded = models.DateTimeField('date uploaded')
     date_modified = models.DateTimeField('date modified')
     date_published = models.DateTimeField('date published')
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
-    owner = models.ForeignKey(ImagrUser, verbose_name="Owner of photo")
+    owner = models.ForeignKey(ImagrUser, verbose_name="Owner of photo",
+                              related_name='photos')
 
 
 class Album(models.Model):
+
+    def __unicode__(self):
+        return self.title
+
     title = models.CharField(max_length=140)
     description = models.CharField(max_length=2000)
     date_uploaded = models.DateTimeField('date uploaded')
@@ -36,4 +47,6 @@ class Album(models.Model):
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of album")
     cover_photo = models.ForeignKey(Photo, related_name="cover_photo")
     photos = models.ManyToManyField(Photo, verbose_name="photos in album",
-                                    limit_choices_to={'owner': owner})
+                                    #limit_choices_to={'owner': owner},
+                                    blank=True,
+                                    )
