@@ -20,4 +20,11 @@ class Photo(models.Model):
 
 
 class Album(models.Model):
-    pass
+    title = models.CharField(max_length=140)
+    description = models.CharField(max_length=2000)
+    date_uploaded = models.DateTimeField('date uploaded')
+    date_modified = models.DateTimeField('date modified')
+    date_published = models.DateTimeField('date published')
+    published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
+    cover_photo = models.ForeignKey(Photo)
+    photos = models.ManyToManyField(Photo, verbose_name="photos in album")
