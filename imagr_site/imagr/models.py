@@ -12,6 +12,7 @@ PUBLISHED_CHOICES = (
 
 
 class ImagrUser(AbstractBaseUser):
+    #following =
     pass
 
 
@@ -34,4 +35,5 @@ class Album(models.Model):
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of album")
     cover_photo = models.ForeignKey(Photo, related_name="cover_photo")
-    photos = models.ManyToManyField(Photo, verbose_name="photos in album")
+    photos = models.ManyToManyField(Photo, verbose_name="photos in album",
+                                    limit_choices_to={'owner': owner})
