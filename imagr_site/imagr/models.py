@@ -12,8 +12,8 @@ PUBLISHED_CHOICES = (
 
 
 class ImagrUser(AbstractBaseUser):
-    #following =
-    pass
+    identifier = models.CharField(max_length=40, unique=True)
+    USERNAME_FIELD = 'identifier'
 
 
 class Photo(models.Model):
