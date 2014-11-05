@@ -1,7 +1,7 @@
-import datetime
+#import datetime
 
 from django.db import models
-from django.utils import timezone
+#from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser
 
 PUBLISHED_CHOICES = (
@@ -49,6 +49,5 @@ class Album(models.Model):
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of album")
     cover_photo = models.ForeignKey(Photo, related_name="cover_photo", blank=True)
     photos = models.ManyToManyField(Photo, verbose_name="photos in album",
-                                    #limit_choices_to={'owner': owner},
                                     blank=True,
                                     )
