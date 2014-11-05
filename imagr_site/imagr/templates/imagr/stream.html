@@ -1,0 +1,16 @@
+<h1>{{ user }}'s Stream</h1>
+<h2>{{ user }}'s Recent Photos</h2>
+<ul>
+  {% for photo in recent_photos %}
+  <li><a href="{% url 'photo_details' photo.pk %}"><img src="{% url 'photo' photo.pk%}" /></a></li>
+  {% endfor %}
+</ul>
+<h2>Friends' Recent Photos</h2>
+<ul>
+  {% for photo in friends_photos %}
+  <li>
+    <a href="{% url 'photo_details' photo.pk %}"><img src="{% url 'photo' photo.pk%}" /></a>
+    <p>by {{photo.owner}}</p>
+  </li>
+  {% endfor %}
+</ul>

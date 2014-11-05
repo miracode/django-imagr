@@ -1,0 +1,13 @@
+{% if albums %}
+<h2>{{ user.identifier }}'s albums</h2>
+<ul>
+{% for album in albums %}
+  <li>
+    <a href="{% url 'album' album.id %}">{{ album.title }}</a>
+    <img src="{% url 'photo' album.cover_photo.id %}" />
+  </li>
+{% endfor %}
+</ul>
+{% else %}
+<h2>{{ user }} has no albums</h2>
+{% endif %}
