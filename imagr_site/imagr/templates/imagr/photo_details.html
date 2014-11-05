@@ -1,0 +1,9 @@
+<h1>{{ photo.title }}</h1>
+<p>{{ photo.owner }}</p>
+<img src="{% url 'photo' photo.id %}" />
+<p> {{ photo.description }} </p>
+<h3>Dates</h3>
+<p>Uploaded: {{ photo.date_uploaded }}</p>
+<p>Modified: {{ photo.date_modified }}</p>
+<p>Published: {{ photo.date_published}}</p>
+<p>Security: {{ photo.published }}</p>
