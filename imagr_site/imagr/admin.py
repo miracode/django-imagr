@@ -22,9 +22,9 @@ class AlbumAdmin(admin.ModelAdmin):
 
 class ImagrUserAdmin(admin.ModelAdmin):
 
-    fields = ['identifier', 'following', 'followers']
-
+    fields = ['identifier', 'password', 'following',
+              'date_joined']
 
 admin.site.register(Photo)
 admin.site.register(Album, AlbumAdmin)
-admin.site.register(ImagrUser)
+admin.site.register(ImagrUser, ImagrUserAdmin)
