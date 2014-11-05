@@ -1,4 +1,4 @@
-import datetime
+# import datetime
 
 from django.db import models
 from django.utils import timezone
@@ -15,9 +15,12 @@ class ImagrUser(AbstractBaseUser):
     identifier = models.CharField(max_length=40, unique=True, default='')
     USERNAME_FIELD = 'identifier'
     following = models.ManyToManyField("self", related_name='followers',
-                                       verbose_name='Following Users',
+                                       verbose_name='People I follow',
                                        blank=True,
-                                       null=True)
+                                       null=True,
+                                       symmetrical=False)
+
+    date_joined = models.DateTimeField('date joined', default=timezone.now())
 
 
 class Photo(models.Model):
@@ -47,7 +50,8 @@ class Album(models.Model):
     date_published = models.DateTimeField('date published', blank=True)
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of album")
-    cover_photo = models.ForeignKey(Photo, related_name="cover_photo", blank=True)
+    cover_photo = models.ForeignKey(Photo, related_name="cover_photo",
+                                    blank=True)
     photos = models.ManyToManyField(Photo, verbose_name="photos in album",
                                     #limit_choices_to={'owner': owner},
                                     blank=True,
