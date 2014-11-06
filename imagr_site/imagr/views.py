@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+# from django.http import HttpResponse
 from imagr.models import Album, Photo, ImagrUser
 from django.views import generic
 from django.utils import timezone
@@ -25,7 +25,7 @@ class AlbumView(generic.DetailView):
 
 
 def photo(request, pk):
-    return HttpResponse('X')
+    return redirect('/static/imagr/Rotating_earth.gif')
 
 
 class PhotoDetails(generic.DetailView):
