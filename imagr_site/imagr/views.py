@@ -12,7 +12,7 @@ def index(request):
 
 def home(request):
     # user = request.user
-    user = ImagrUser.objects.all()[0]
+    user = ImagrUser.objects.all()[1]
     album_list = Album.objects.filter(owner__pk=user.pk)
     context = {'albums': album_list,
                'user': user, }
@@ -35,7 +35,7 @@ class PhotoDetails(generic.DetailView):
 
 def stream(request):
     # user = request.user
-    user = ImagrUser.objects.all()[0]
+    user = ImagrUser.objects.all()[1]
     our_recent_photos = Photo.objects.filter(
         owner=user,
         date_published__gt=timezone.now() - datetime.timedelta(days=5))

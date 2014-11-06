@@ -2,7 +2,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractUser
 
 PUBLISHED_CHOICES = (
     ('private', 'This is private'),
@@ -11,16 +11,12 @@ PUBLISHED_CHOICES = (
 )
 
 
-class ImagrUser(AbstractBaseUser):
-    identifier = models.CharField(max_length=40, unique=True, default='')
-    USERNAME_FIELD = 'identifier'
+class ImagrUser(AbstractUser):
     following = models.ManyToManyField("self", related_name='followers',
                                        verbose_name='People I follow',
                                        blank=True,
                                        null=True,
                                        symmetrical=False)
-
-    date_joined = models.DateTimeField('date joined', default=timezone.now())
 
 
 class Photo(models.Model):
