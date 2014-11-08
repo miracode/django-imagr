@@ -18,6 +18,11 @@ class ImagrUser(AbstractUser):
                                        null=True,
                                        symmetrical=False)
 
+    def followers_mask(self):
+        return ", ".join(
+            [follower.username for follower in self.followers.all()])
+    followers_mask.short_description = "Followers"
+
 
 class Photo(models.Model):
 

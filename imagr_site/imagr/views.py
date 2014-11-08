@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 # from django.http import HttpResponse
-from imagr.models import Album, Photo, ImagrUser
+from imagr.models import Album, Photo
 from django.views import generic
 from django.utils import timezone
 import datetime
@@ -11,8 +11,7 @@ def index(request):
 
 
 def home(request):
-    # user = request.user
-    user = ImagrUser.objects.all()[1]
+    user = request.user
     album_list = Album.objects.filter(owner__pk=user.pk)
     context = {'albums': album_list,
                'user': user, }
@@ -34,8 +33,7 @@ class PhotoDetails(generic.DetailView):
 
 
 def stream(request):
-    # user = request.user
-    user = ImagrUser.objects.all()[1]
+    user = request.user
     our_recent_photos = Photo.objects.filter(
         owner=user,
         date_published__gt=timezone.now() - datetime.timedelta(days=5))

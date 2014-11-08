@@ -14,4 +14,6 @@ urlpatterns = patterns(
     url(r'^photo/(?P<pk>\d+)/details$', views.PhotoDetails.as_view(),
         name='photo_details'),
     url(r'^stream[/]?$', views.stream, name='stream'),
+    (r'^login/$', 'django.contrib.auth.views.login',
+        {'template_name': 'imagr/login.html'}),
 )
