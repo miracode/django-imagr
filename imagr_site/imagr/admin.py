@@ -22,7 +22,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
 class ImagrUserAdmin(admin.ModelAdmin):
 
-    fields = ['identifier', 'password', 'following',
+    fields = ['username', 'password', 'following',
               'date_joined']
 
 admin.site.register(Photo)
