@@ -1,5 +1,8 @@
 from django.contrib import admin
 from imagr.models import Photo, Album, ImagrUser
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import forms
 
 
 class AlbumAdmin(admin.ModelAdmin):
@@ -20,10 +23,36 @@ class AlbumAdmin(admin.ModelAdmin):
                                                                 **kwargs)
 
 
-class ImagrUserAdmin(admin.ModelAdmin):
+# This is taken directly from
+# http://stackoverflow.com/questions/16953302/
+# django-custom-user-model-in-admin-relation-auth-user-does-not-exist
+# See discussion there on the weird django 'bug' it solves
+class NewUserCreationForm(UserCreationForm):
+    def clean_username(self):
+        # Since User.username is unique, this check is redundant,
+        # but it sets a nicer error message than the ORM. See #13147.
+        username = self.cleaned_data["username"]
+        try:
+            ImagrUser._default_manager.get(username=username)
+        except ImagrUser.DoesNotExist:
+            return username
+        raise forms.ValidationError(self.error_messages['duplicate_username'])
 
-    fields = ['identifier', 'password', 'following',
-              'date_joined']
+    class Meta(UserCreationForm.Meta):
+        model = ImagrUser
+
+
+class ImagrUserAdmin(UserAdmin):
+    model = ImagrUser
+
+    readonly_fields = ['followers_mask']
+    add_form = NewUserCreationForm
+    fieldsets = [item for item in UserAdmin.fieldsets] + [
+        ('Followship', {'fields': ['following', 'followers_mask']}),
+    ]
+
+    list_display = ('username',)
+
 
 admin.site.register(Photo)
 admin.site.register(Album, AlbumAdmin)
