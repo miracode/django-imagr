@@ -1,4 +1,4 @@
-#import datetime
+import datetime
 
 from django.db import models
 from django.utils import timezone
@@ -41,8 +41,10 @@ class Photo(models.Model):
                               related_name='photos')
 
     def was_published_recently(self):
-        return self.date_published >= (timezone.now() -
-                                       datetime.timedelta(days=5))
+        now = timezone.now()
+        return (now - datetime.timedelta(days=5) <= self.date_published
+                <= now)
+
     was_published_recently.boolean = True
 
 
