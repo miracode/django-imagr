@@ -8,9 +8,9 @@ install: "pip install -r requirements.txt"
 services:
   - postgresql
 before_script:
-  - cp /imagr_site/imagr_site/settings.py imagr_site/imagr_site/settings.py
+  - cp ./imagr_site/imagr_site/settings.py ./imagr_site/imagr_site/settings.py
   - psql -c 'create database imagr;' -U postgres
-  - sed -i -e 's/getpass.getuser()/"postgres"/g' imagr_site/imagr_site/settings.py
+  - sed -i -e 's/getpass.getuser()/"postgres"/g' ./imagr_site/imagr_site/settings.py
   - python /imagr_site/manage.py syncdb -migrate -noinput
 # command to run tests
 script: python ./imagr_site/manage.py test imagr
