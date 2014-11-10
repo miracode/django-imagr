@@ -73,6 +73,7 @@ class PhotoAdmin(admin.ModelAdmin):
     readonly_fields = ['date_uploaded', 'date_modified', 'date_published']
 
     list_display = ('title', 'linked_owner', 'file_size')
+    list_filter = ['date_uploaded']
 
     def linked_owner(self, request):
         owner_url = urlresolvers.reverse('admin:imagr_imagruser_change',
