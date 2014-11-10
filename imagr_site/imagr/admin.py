@@ -6,6 +6,30 @@ from django.contrib.auth import forms
 from django.core import urlresolvers
 
 
+class PhotoSizeFilter(admin.SimpleListFilter):
+    title = 'file size'
+
+    parameter_name = 'file_size'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('<=1MB', '<=1MB'),
+            ('<=10MB', '<=10MB'),
+            ('<=100MB', '<=100MB'),
+            ('>100MB', '>100MB'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == '<=1MB':
+            return queryset.filter(file_size__lte=1)
+        if self.value() == '<=10MB':
+            return queryset.filter(file_size__lte=10)
+        if self.value() == '<=100MB':
+            return queryset.filter(file_size__lte=100)
+        if self.value() == '>100MB':
+            return queryset.filter(file_size__gt=100)
+
+
 class AlbumAdmin(admin.ModelAdmin):
 
     readonly_fields = ['date_created', 'date_modified', 'date_published']
@@ -76,7 +100,7 @@ class PhotoAdmin(admin.ModelAdmin):
     readonly_fields = ['date_uploaded', 'date_modified', 'date_published']
 
     list_display = ('title', 'linked_owner', 'file_size')
-    list_filter = ['date_uploaded']
+    list_filter = ['date_uploaded', PhotoSizeFilter]
     search_fields = ['owner__username', 'owner__first_name',
                      'owner__last_name', 'owner__email']
 
