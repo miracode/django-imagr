@@ -3,9 +3,38 @@ from imagr.models import Photo, Album, ImagrUser
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import forms
+from django.core import urlresolvers
+
+
+class PhotoSizeFilter(admin.SimpleListFilter):
+    title = 'file size'
+
+    parameter_name = 'file_size'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('<=1MB', '<=1MB'),
+            ('<=10MB', '<=10MB'),
+            ('<=100MB', '<=100MB'),
+            ('>100MB', '>100MB'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == '<=1MB':
+            return queryset.filter(file_size__lte=1)
+        if self.value() == '<=10MB':
+            return queryset.filter(file_size__lte=10)
+        if self.value() == '<=100MB':
+            return queryset.filter(file_size__lte=100)
+        if self.value() == '>100MB':
+            return queryset.filter(file_size__gt=100)
 
 
 class AlbumAdmin(admin.ModelAdmin):
+
+    readonly_fields = ['date_created', 'date_modified', 'date_published']
+
+    list_display = ('title', 'linked_owner')
 
     def get_form(self, request, obj=None, **kwargs):
         request.obj = obj
@@ -21,6 +50,16 @@ class AlbumAdmin(admin.ModelAdmin):
         return super(AlbumAdmin, self).formfield_for_manytomany(db_field,
                                                                 request,
                                                                 **kwargs)
+
+    def linked_owner(self, request):
+        owner_url = urlresolvers.reverse('admin:imagr_imagruser_change',
+                                         args=(request.owner.pk, ))
+        user_name = request.owner.username
+        string = '<a href="%s">%s</a>' % (owner_url, user_name)
+        return string
+
+    linked_owner.allow_tags = True
+
 
 
 # This is taken directly from
@@ -53,7 +92,28 @@ class ImagrUserAdmin(UserAdmin):
 
     list_display = ('username',)
 
+    search_fields = ['username', 'first_name',
+                     'last_name', 'email']
 
-admin.site.register(Photo)
+
+class PhotoAdmin(admin.ModelAdmin):
+    readonly_fields = ['date_uploaded', 'date_modified', 'date_published']
+
+    list_display = ('title', 'linked_owner', 'file_size')
+    list_filter = ['date_uploaded', PhotoSizeFilter]
+    search_fields = ['owner__username', 'owner__first_name',
+                     'owner__last_name', 'owner__email']
+
+    def linked_owner(self, request):
+        owner_url = urlresolvers.reverse('admin:imagr_imagruser_change',
+                                         args=(request.owner.pk, ))
+        user_name = request.owner.username
+        string = '<a href="%s">%s</a>' % (owner_url, user_name)
+        return string
+
+    linked_owner.allow_tags = True
+
+
+admin.site.register(Photo, PhotoAdmin)
 admin.site.register(Album, AlbumAdmin)
 admin.site.register(ImagrUser, ImagrUserAdmin)
