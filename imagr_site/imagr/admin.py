@@ -10,7 +10,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
     readonly_fields = ['date_created', 'date_modified', 'date_published']
 
-    list_display = ('title', 'owner')
+    list_display = ('title', 'linked_owner')
 
     def get_form(self, request, obj=None, **kwargs):
         request.obj = obj
@@ -26,6 +26,16 @@ class AlbumAdmin(admin.ModelAdmin):
         return super(AlbumAdmin, self).formfield_for_manytomany(db_field,
                                                                 request,
                                                                 **kwargs)
+
+    def linked_owner(self, request):
+        owner_url = urlresolvers.reverse('admin:imagr_imagruser_change',
+                                         args=(request.owner.pk, ))
+        user_name = request.owner.username
+        string = '<a href="%s">%s</a>' % (owner_url, user_name)
+        return string
+
+    linked_owner.allow_tags = True
+
 
 
 # This is taken directly from
