@@ -39,6 +39,8 @@ class Photo(models.Model):
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of photo",
                               related_name='photos')
+    file_size = models.DecimalField(max_digits=6, decimal_places=3, blank=True,
+                                    null=True, verbose_name="File Size (MB)")
 
     def was_published_recently(self):
         now = timezone.now()
@@ -53,9 +55,11 @@ class Album(models.Model):
     def __unicode__(self):
         return self.title
 
+    now = timezone.now()
+
     title = models.CharField(max_length=140)
     description = models.CharField(max_length=2000, blank=True, null=True)
-    date_uploaded = models.DateTimeField('date uploaded')
+    date_created = models.DateTimeField('date created', default=now)
     date_modified = models.DateTimeField('date modified', blank=True,
                                          null=True)
     date_published = models.DateTimeField('date published', blank=True,
