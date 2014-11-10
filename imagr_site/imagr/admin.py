@@ -3,9 +3,14 @@ from imagr.models import Photo, Album, ImagrUser
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import forms
+from django.core import urlresolvers
 
 
 class AlbumAdmin(admin.ModelAdmin):
+
+    readonly_fields = ['date_created', 'date_modified', 'date_published']
+
+    list_display = ('title', 'owner')
 
     def get_form(self, request, obj=None, **kwargs):
         request.obj = obj
@@ -54,6 +59,21 @@ class ImagrUserAdmin(UserAdmin):
     list_display = ('username',)
 
 
-admin.site.register(Photo)
+class PhotoAdmin(admin.ModelAdmin):
+    readonly_fields = ['date_uploaded', 'date_modified', 'date_published']
+
+    list_display = ('title', 'linked_owner', 'file_size')
+
+    def linked_owner(self, request):
+        owner_url = urlresolvers.reverse('admin:imagr_imagruser_change',
+                                         args=(request.owner.pk, ))
+        user_name = request.owner.username
+        string = '<a href="%s">%s</a>' % (owner_url, user_name)
+        return string
+
+    linked_owner.allow_tags = True
+
+
+admin.site.register(Photo, PhotoAdmin)
 admin.site.register(Album, AlbumAdmin)
 admin.site.register(ImagrUser, ImagrUserAdmin)
