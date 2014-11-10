@@ -11,10 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='imagruser',
-            name='identifier',
-            field=models.CharField(default='', unique=True, max_length=40),
-            preserve_default=False,
+        migrations.AlterField(
+            model_name='album',
+            name='photos',
+            field=models.ManyToManyField(to='imagr.Photo', verbose_name=b'photos in album', blank=True),
+            preserve_default=True,
         ),
     ]

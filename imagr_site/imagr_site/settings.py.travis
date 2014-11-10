@@ -60,10 +60,8 @@ WSGI_APPLICATION = 'imagr_site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'imagr',
-        'USER': 'imagr',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': 'test_imagr',
+        'USER': 'postgres',
     }
 }
 

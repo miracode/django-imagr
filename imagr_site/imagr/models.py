@@ -1,8 +1,8 @@
-# import datetime
+import datetime
 
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractUser
 
 PUBLISHED_CHOICES = (
     ('private', 'This is private'),
@@ -11,16 +11,17 @@ PUBLISHED_CHOICES = (
 )
 
 
-class ImagrUser(AbstractBaseUser):
-    identifier = models.CharField(max_length=40, unique=True, default='')
-    USERNAME_FIELD = 'identifier'
+class ImagrUser(AbstractUser):
     following = models.ManyToManyField("self", related_name='followers',
                                        verbose_name='People I follow',
                                        blank=True,
                                        null=True,
                                        symmetrical=False)
 
-    date_joined = models.DateTimeField('date joined', default=timezone.now())
+    def followers_mask(self):
+        return ", ".join(
+            [follower.username for follower in self.followers.all()])
+    followers_mask.short_description = "Followers"
 
 
 class Photo(models.Model):
@@ -29,13 +30,22 @@ class Photo(models.Model):
         return self.title
 
     title = models.CharField(max_length=140)
-    description = models.CharField(max_length=2000, blank=True)
+    description = models.CharField(max_length=2000, blank=True, null=True)
     date_uploaded = models.DateTimeField('date uploaded')
-    date_modified = models.DateTimeField('date modified', blank=True)
-    date_published = models.DateTimeField('date published', blank=True)
+    date_modified = models.DateTimeField('date modified', blank=True,
+                                         null=True)
+    date_published = models.DateTimeField('date published', blank=True,
+                                          null=True)
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of photo",
                               related_name='photos')
+
+    def was_published_recently(self):
+        now = timezone.now()
+        return (now - datetime.timedelta(days=5) <= self.date_published
+                <= now)
+
+    was_published_recently.boolean = True
 
 
 class Album(models.Model):
@@ -44,15 +54,16 @@ class Album(models.Model):
         return self.title
 
     title = models.CharField(max_length=140)
-    description = models.CharField(max_length=2000, blank=True)
+    description = models.CharField(max_length=2000, blank=True, null=True)
     date_uploaded = models.DateTimeField('date uploaded')
-    date_modified = models.DateTimeField('date modified', blank=True)
-    date_published = models.DateTimeField('date published', blank=True)
+    date_modified = models.DateTimeField('date modified', blank=True,
+                                         null=True)
+    date_published = models.DateTimeField('date published', blank=True,
+                                          null=True)
     published = models.CharField(max_length=8, choices=PUBLISHED_CHOICES)
     owner = models.ForeignKey(ImagrUser, verbose_name="Owner of album")
     cover_photo = models.ForeignKey(Photo, related_name="cover_photo",
-                                    blank=True)
+                                    blank=True, null=True)
     photos = models.ManyToManyField(Photo, verbose_name="photos in album",
-                                    #limit_choices_to={'owner': owner},
                                     blank=True,
                                     )
