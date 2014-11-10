@@ -68,6 +68,9 @@ class ImagrUserAdmin(UserAdmin):
 
     list_display = ('username',)
 
+    search_fields = ['username', 'first_name',
+                     'last_name', 'email']
+
 
 class PhotoAdmin(admin.ModelAdmin):
     readonly_fields = ['date_uploaded', 'date_modified', 'date_published']
