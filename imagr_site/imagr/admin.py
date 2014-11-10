@@ -74,6 +74,8 @@ class PhotoAdmin(admin.ModelAdmin):
 
     list_display = ('title', 'linked_owner', 'file_size')
     list_filter = ['date_uploaded']
+    search_fields = ['owner__username', 'owner__first_name',
+                     'owner__last_name', 'owner__email']
 
     def linked_owner(self, request):
         owner_url = urlresolvers.reverse('admin:imagr_imagruser_change',
