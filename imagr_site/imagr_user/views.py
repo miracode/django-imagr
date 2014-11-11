@@ -75,7 +75,7 @@ class RegistrationView(BaseRegistrationView):
                                      request=request)
         return new_user
 
-    def registration_allowed(self, request):
+    def registration_allowed(self, request=None):
         """
         Indicate whether account registration is currently permitted,
         based on the value of the setting ``REGISTRATION_OPEN``. This
@@ -87,7 +87,7 @@ class RegistrationView(BaseRegistrationView):
         """
         return getattr(settings, 'REGISTRATION_OPEN', True)
 
-    def get_success_url(self, user):
+    def get_success_url(self, user, request=None):
         """
         Return the name of the URL to redirect to after successful
         user registration.
