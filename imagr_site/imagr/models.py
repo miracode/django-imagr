@@ -2,13 +2,24 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser  # , UserManager
 
 PUBLISHED_CHOICES = (
     ('private', 'This is private'),
     ('shared', 'This is shared'),
     ('public', 'This is public'),
 )
+
+
+# class ImagrUserManager(UserManager):
+#     def create_user(username, email=None, password=None, **extra_fields):
+#         user = ImagrUser(username=username, password=password, email=email)
+#         return user
+
+#     def create_superuser(username, email, password, **extra_fields):
+#         user = ImagrUser(username=username, password=password, email=email,
+#                          is_superuser=True)
+#         return user
 
 
 class ImagrUser(AbstractUser):
@@ -22,6 +33,8 @@ class ImagrUser(AbstractUser):
         return ", ".join(
             [follower.username for follower in self.followers.all()])
     followers_mask.short_description = "Followers"
+
+    # objects = ImagrUserManager()
 
 
 class Photo(models.Model):

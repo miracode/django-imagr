@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'imagr',
+    'imagr_user'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -87,3 +88,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'imagr.ImagrUser'
+
+REGISTRATION_OPEN = True
+
+ACCOUNT_ACTIVATION_DAYS = 5
+
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'postmaster@sandbox69d94a37b34446bf8dd4aba33f0d68cc.mailgun.org'
+EMAIL_HOST_PASSWORD = '5218843e888eb0a4c7d4181cb89734c9'
