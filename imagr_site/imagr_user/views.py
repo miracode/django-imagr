@@ -111,3 +111,4 @@ class ActivationView(BaseActivationView):
 
     def get_success_url(self, user):
         return ('registration_activation_complete', (), {})
+

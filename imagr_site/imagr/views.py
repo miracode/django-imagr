@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect
 # from django.http import HttpResponse
 from imagr.models import Album, Photo
 from django.views import generic
+from django.views.generic.edit import FormView
 from django.utils import timezone
 import datetime
+import aws_bucket
+from imagr.forms import UploadPhotoForm
 
 
 def index(request):
@@ -47,3 +50,17 @@ def stream(request):
                'recent_photos': our_recent_photos,
                'friends_photos': friends_recent_photos}
     return render(request, 'imagr/stream.html', context)
+
+
+class UploadPhotoView(FormView):
+    template_name = 'imagr/photo_upload.html'
+    form_class = UploadPhotoForm
+
+    def get_form_kwargs(self):
+        kwargs = super(UploadPhotoView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('/imagr/home/')

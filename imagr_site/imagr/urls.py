@@ -11,7 +11,7 @@ urlpatterns = patterns(
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^$', views.index, name='index'),
-    url(r'^home[/]?$', views.home, name='index'),
+    url(r'^home[/]?$', views.home, name='home'),
     url(r'^album/(?P<pk>\d+)/$', views.AlbumView.as_view(), name='album'),
     url(r'^photo/(?P<pk>\d+)/$', views.photo, name='photo'),
     url(r'^photo/(?P<pk>\d+)/details$', views.PhotoDetails.as_view(),
@@ -62,4 +62,6 @@ urlpatterns = patterns(
     url(r'^password/reset/done/$',
         auth_views.password_reset_done,
         name='auth_password_reset_done'),
+    url(r'^upload_photo/$', 
+        views.UploadPhotoView.as_view(), name='upload_photo')
 )
