@@ -42,3 +42,19 @@ class UploadPhotoForm(ModelForm):
             album.photos.add(photo)
 
         aws_bucket.upload_photo(photo.pk, self.cleaned_data['photo_file'])
+
+
+class AddPhotoForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        self.album = Album.objects.get(id=kwargs.pop('album_id'))
+        photos = Photo.objects.filter(owner=self.user.pk)
+        choices = [(photo.pk, photo.title) for photo in photos
+                   if self.album not in photo.album_set.all()]
+        super(AddPhotoForm, self).__init__(*args, **kwargs)
+        photo_field = forms.MultipleChoiceField(choices=choices)
+        photo_field.label = "Add Photos to this Album"
+        photo_field.required = False
+        self.fields['photo_field'] = photo_field
+
+    fields = ['photo_field']

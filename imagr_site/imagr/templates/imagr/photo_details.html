@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
 <h1>{{ photo.title }}</h1>
 <p>{{ photo.owner }}</p>
 <img src="{% url 'photo' photo.id %}" />
@@ -7,3 +11,4 @@
 <p>Modified: {{ photo.date_modified }}</p>
 <p>Published: {{ photo.date_published}}</p>
 <p>Security: {{ photo.published }}</p>
+{% endblock %}

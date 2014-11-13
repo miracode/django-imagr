@@ -1,6 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
 {% if album.photos.all %}
 <h1>{{ album.title }}</h1>
 <ul>
+  <form action="{% url 'album' album.pk %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <p><input type="submit" value="Submit" /></p>
+  </form>
   {% for photo in album.photos.all %}
   <li><a href="{% url 'photo_details' photo.pk %}"><img src="{% url 'photo' photo.pk%}" /></a></li>
   {% endfor %}
@@ -8,3 +17,4 @@
 {% else %}
 <h1>{{ album.title }} has no photos </h1>
 {% endif %}
+{% endblock %}

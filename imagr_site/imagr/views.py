@@ -5,7 +5,7 @@ from django.views import generic
 from django.views.generic.edit import FormView
 from django.utils import timezone
 import datetime
-from imagr.forms import UploadPhotoForm
+from imagr.forms import UploadPhotoForm, AddPhotoForm
 
 
 def index(request):
@@ -23,6 +23,13 @@ def home(request):
 class AlbumView(generic.DetailView):
     model = Album
     template_name = 'imagr/album.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AlbumView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['form'] = AddPhotoForm(user=self.request.user,
+                                       album_id=context['album'].pk)
+        return context
 
 
 def photo(request, pk):
