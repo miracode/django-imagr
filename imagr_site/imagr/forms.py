@@ -8,18 +8,19 @@ import aws_bucket
 class UploadPhotoForm(ModelForm):
     photo_file = forms.FileField()
 
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         albums = Album.objects.filter(owner=self.user.pk)
         choices = [(album.pk, album.title) for album in albums]
         super(UploadPhotoForm, self).__init__(*args, **kwargs)
-        self.fields['album_field'] = forms.MultipleChoiceField(choices=choices)
+        album_field = forms.MultipleChoiceField(choices=choices)
+        album_field.label = "Add to Albums"
+        album_field.required = False
+        self.fields['album_field'] = album_field
 
     class Meta:
         model = Photo
         fields = ['title', 'description', 'photo_file', 'published']
-
 
     def save(self, commit=True):
         now = timezone.now()

@@ -5,7 +5,6 @@ from django.views import generic
 from django.views.generic.edit import FormView
 from django.utils import timezone
 import datetime
-import aws_bucket
 from imagr.forms import UploadPhotoForm
 
 
@@ -27,7 +26,7 @@ class AlbumView(generic.DetailView):
 
 
 def photo(request, pk):
-    return redirect('/static/imagr/Rotating_earth.gif')
+    return redirect('http://imagr.jasonbrokaw.com/%s' % pk)
 
 
 class PhotoDetails(generic.DetailView):
