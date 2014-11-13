@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 # from django.http import HttpResponse
-from imagr.models import Album, Photo
+from imagr.models import Album, Photo, ImagrUser
 from django.views import generic
 from django.views.generic.edit import FormView
 from django.utils import timezone
 import datetime
-from imagr.forms import UploadPhotoForm, AddPhotoForm
+from imagr.forms import UploadPhotoForm, AddPhotoForm, AlbumForm, FollowForm
 
 
 def index(request):
@@ -30,6 +30,13 @@ class AlbumView(generic.DetailView):
         context['form'] = AddPhotoForm(user=self.request.user,
                                        album_id=context['album'].pk)
         return context
+
+    def post(self, request, **kwargs):
+        album_id = kwargs.pop('pk')
+        photo_id = request.POST['photo_field']
+        photo = Photo.objects.get(id=photo_id)
+        Album.objects.get(id=album_id).photos.add(photo)
+        return redirect(request.path)
 
 
 def photo(request, pk):
@@ -70,3 +77,37 @@ class UploadPhotoView(FormView):
     def form_valid(self, form):
         form.save()
         return redirect('/imagr/home/')
+
+
+class CreateAlbumView(FormView):
+    template_name = 'imagr/create_album.html'
+    form_class = AlbumForm
+
+    def get_form_kwargs(self):
+        kwargs = super(CreateAlbumView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('/imagr/home/')
+
+
+class ProfileView(generic.DetailView):
+    model = ImagrUser
+    template_name = 'imagr/profile.html'
+    success_url = '/imagr/profile/'
+
+    def get_object(self):
+        self.form = FollowForm(instance=self.request.user)
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileView, self).get_context_data(
+            pk=self.request.user.pk, **kwargs)
+        context['form'] = self.form
+        return context
+
+    def post(self, request, **kwargs):
+        self.form.save(request.POST)
+        return redirect('/imagr/profile/')

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{{ imaguser.username }}</h1>
+<h3>Dates</h3>
+<p>Date Joined: {{ imagruser.date_joined }}</p>
+<p>Followers: {{ imagruser.followers_mask }}</p>
+<p>Follow:</p>
+<form action="{% url 'profile' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <p><input type="submit" value="Update" /></p>
+</form>
+{% endblock %}

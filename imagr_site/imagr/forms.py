@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from imagr.models import Photo, Album
+from imagr.models import Photo, Album, ImagrUser
 from django.utils import timezone
 import aws_bucket
 
@@ -58,3 +58,56 @@ class AddPhotoForm(forms.Form):
         self.fields['photo_field'] = photo_field
 
     fields = ['photo_field']
+
+
+class AlbumForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        photos = Photo.objects.filter(owner=self.user.pk)
+        choices = [(photo.pk, photo.title) for photo in photos]
+        super(AlbumForm, self).__init__(*args, **kwargs)
+
+        photos_field = forms.MultipleChoiceField(choices=choices)
+        photos_field.label = "Add Photos to Album"
+        photos_field.required = False
+        self.fields['photos_field'] = photos_field
+
+        cover_photo_field = forms.ChoiceField(choices=choices)
+        cover_photo_field.label = "Cover Photo"
+        cover_photo_field.required = False
+        self.fields['cover_photo_field'] = cover_photo_field
+
+    class Meta:
+        model = Album
+        fields = ['title', 'description', 'published']
+
+    def save(self, commit=True):
+        now = timezone.now()
+        title = self.cleaned_data['title']
+        description = self.cleaned_data['description']
+        owner = self.user
+        published = self.cleaned_data['published']
+
+        # Make these fields
+        cover_photo_id = self.cleaned_data['cover_photo_field']
+        cover_photo = Photo.objects.get(id=cover_photo_id)
+        photo_ids = self.cleaned_data['photos_field']
+
+        album = Album(title=title, description=description,
+                      date_created=now, published=published, owner=owner,
+                      cover_photo=cover_photo)
+
+        album.save()
+
+        photos = Photo.objects.filter(id__in=photo_ids)
+
+        for photo in photos:
+            album.photos.add(photo)
+
+        album.photos.add(cover_photo)
+
+
+class FollowForm(forms.ModelForm):
+    class Meta:
+        model = ImagrUser
+        fields = ['following']
