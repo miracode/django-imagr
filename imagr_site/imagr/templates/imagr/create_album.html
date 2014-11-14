@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<form action="{% url 'create_album' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <p><input type="submit" value="Create" /></p>
+</form>
+{% endblock %}
