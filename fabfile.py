@@ -2,6 +2,7 @@ from fabric.api import task, cd, run, env, prompt, execute, sudo, open_shell
 from fabric.api import settings
 import fabric.contrib
 import time
+import os
 import boto
 import boto.ec2
 import logging
@@ -126,19 +127,32 @@ def run_command_on_selected_server(command):
     execute(command, hosts=selected_hosts)
 
 
-def _install_django_requirements():
+def _install_imagr_requirements():
     sudo('apt-get update')
     sudo('apt-get -y upgrade')
     sudo('apt-get -y install python-pip')
     sudo('apt-get -y install python-dev')
+    sudo('apt-get -y install postgresql-9.3')
     sudo('apt-get -y install postgresql-server-dev-9.3')
     sudo('apt-get -y install git')
 
-    if not fabric.contrib.files.exists('~/django-imagr/', use_sudo=True):
+    if not fabric.contrib.files.exists('~/django-imagr/'):
         with settings(warn_only=True):
             sudo('git clone https://github.com/miracode/django-imagr.git')
     with cd('django-imagr'):
         sudo('pip install -r requirements.txt')
+
+
+def _setup_database():
+    # Set this environment variable on local machine before running this!
+    password = os.environ['DATABASE_PASSWORD']
+    create_user_command = """"
+  create user imagr with password '%s';
+  grant all on database imagr to imagr;"
+""" % password
+    with settings(warn_only=True):
+        sudo('createdb imagr', user='postgres')
+    sudo('psql -U postgres imagr -c %s' % create_user_command, user='postgres')
 
 
 def _install_nginx():
@@ -148,7 +162,12 @@ def _install_nginx():
 
 @task
 def install_django_imagr():
-    run_command_on_selected_server(_install_django_requirements)
+    run_command_on_selected_server(_install_imagr_requirements)
+
+
+@task
+def setup_imagr_database():
+    run_command_on_selected_server(_setup_database)
 
 
 @task
