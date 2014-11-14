@@ -93,9 +93,10 @@ class CreateAlbumView(FormView):
         return redirect('/imagr/home/')
 
 
-class ProfileView(generic.DetailView):
+class ProfileView(generic.DetailView, generic.edit.UpdateView):
     model = ImagrUser
     template_name = 'imagr/profile.html'
+    fields = ['following']
     success_url = '/imagr/profile/'
 
     def get_object(self):
@@ -107,7 +108,3 @@ class ProfileView(generic.DetailView):
             pk=self.request.user.pk, **kwargs)
         context['form'] = self.form
         return context
-
-    def post(self, request, **kwargs):
-        self.form.save(request.POST)
-        return redirect('/imagr/profile/')
