@@ -1,12 +1,11 @@
 from fabric.api import task, cd, run, env, prompt, execute, sudo, open_shell
-from fabric.api import settings
+from fabric.api import settings, put
 import fabric.contrib
 import time
 import os
+# import io
 import boto
 import boto.ec2
-import logging
-logging.getLogger('foo').addHandler(logging.NullHandler())
 
 env.hosts = ['localhost', ]
 env["user"] = "ubuntu"
@@ -155,6 +154,20 @@ def _setup_database():
     sudo('psql -U postgres imagr -c %s' % create_user_command, user='postgres')
 
 
+def _start_server():
+    secrets_file_name = raw_input("Enter the name & path for the secrets.sh file: ")
+    env.secrets_file = put(secrets_file_name, '/etc/profile.d/')[0]
+    boto_file_name = raw_input("Enter the name & path for the .boto file: ")
+    if not fabric.contrib.files.exists('~/.boto'):
+        put(boto_file_name, '.')
+    sudo('chmod 400 .boto')
+    run('source ' + env.secrets_file)
+    with cd('django-imagr/imagr_site'):
+        sudo('python manage.py migrate')
+        sudo('source %s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application &'
+             % env.secrets_file)
+
+
 def _install_nginx():
     sudo('apt-get install nginx')
     sudo('/etc/init.d/nginx start')
@@ -168,6 +181,11 @@ def install_django_imagr():
 @task
 def setup_imagr_database():
     run_command_on_selected_server(_setup_database)
+
+
+@task
+def start_server():
+    run_command_on_selected_server(_start_server)
 
 
 @task
@@ -215,10 +233,6 @@ def release_address():
     choice = prompt(prompt_text, validate=validation)
     addresses[choice - 1].release()
 
-
-@task
-def list_addresses():
-    pass
 
 ### Dan's stuff down here for ref.
 # from fabric.api import local
