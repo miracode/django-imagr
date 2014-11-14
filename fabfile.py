@@ -1,8 +1,11 @@
 from fabric.api import task, cd, run, env, prompt, execute, sudo, open_shell
 from fabric.api import settings
+import fabric.contrib
 import time
 import boto
 import boto.ec2
+import logging
+logging.getLogger('foo').addHandler(logging.NullHandler())
 
 env.hosts = ['localhost', ]
 env["user"] = "ubuntu"
@@ -129,13 +132,11 @@ def _install_django_requirements():
         sudo('apt-get upgrade')
         sudo('apt-get install python-pip')
         sudo('apt-get install python-dev')
+        sudo('apt-get install postgresql-server-dev-9.3')
+        sudo('apt-get install git')
 
-    # set up database
-    # sudo('apt-get install postgresql-9.3')
-    sudo('apt-get install postgresql-server-dev-9.3')
-    sudo('apt-get install git')
-
-    sudo('git clone https://github.com/miracode/django-imagr.git')
+    if not fabric.contrib.files.exists('~/django-imagr/', use_sudo=True):
+        sudo('git clone https://github.com/miracode/django-imagr.git')
     with cd('django-imagr'):
         sudo('pip install -r requirements.txt')
 
