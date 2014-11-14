@@ -57,7 +57,7 @@ def stream(request):
     friends_recent_photos = []
     for friend in user.following.all():
         for photo in friend.photos.all():
-            if photo.was_published_recently:
+            if photo.was_published_recently():
                 friends_recent_photos.append(photo)
     context = {'user': user,
                'recent_photos': our_recent_photos,
