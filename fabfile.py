@@ -155,16 +155,18 @@ def _setup_database():
 
 
 def _start_server():
-    secrets_file_name = raw_input("Enter the name & path for the secrets.sh file: ")
+    secrets_file_name = \
+        raw_input("Enter the name & path for the secrets.sh file: ")
     env.secrets_file = put(secrets_file_name, '/etc/profile.d/')[0]
     boto_file_name = raw_input("Enter the name & path for the .boto file: ")
     if not fabric.contrib.files.exists('~/.boto'):
-        put(boto_file_name, '.')
+        boto_file_name = put(boto_file_name, '.')[0]
+        sudo('mv %s ~/.boto' % boto_file_name)
     sudo('chmod 400 .boto')
     run('source ' + env.secrets_file)
     with cd('django-imagr/imagr_site'):
         sudo('python manage.py migrate')
-        sudo('source %s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application &'
+        sudo('source %s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application'
              % env.secrets_file)
 
 
