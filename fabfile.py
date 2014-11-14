@@ -1,4 +1,5 @@
-from fabric.api import task, cd, run, env, prompt, execute, sudo
+from fabric.api import task, cd, run, env, prompt, execute, sudo, open_shell
+from fabric.api import settings
 import time
 import boto
 import boto.ec2
@@ -123,15 +124,15 @@ def run_command_on_selected_server(command):
 
 
 def _install_django_requirements():
-    sudo('apt-get update')
-    sudo('apt-get upgrade')
-    sudo('apt-get install python-pip')
+    with settings(prompts={'Do you want to continue [Y/n]? ': 'Y'}):
+        sudo('apt-get update')
+        sudo('apt-get upgrade')
+        sudo('apt-get install python-pip')
+        sudo('apt-get install python-dev')
 
     # set up database
-    sudo('apt-get install postgresql-9.3')
+    # sudo('apt-get install postgresql-9.3')
     sudo('apt-get install postgresql-server-dev-9.3')
-    # Might have to do this manually???
-    # sudo('-u postgres createuser imagr -s -P %s' % password)
     sudo('apt-get install git')
 
     sudo('git clone https://github.com/miracode/django-imagr.git')
@@ -145,8 +146,18 @@ def _install_nginx():
 
 
 @task
+def install_django_imagr():
+    run_command_on_selected_server(_install_django_requirements)
+
+
+@task
 def install_nginx():
     run_command_on_selected_server(_install_nginx)
+
+
+@task
+def ssh():
+    run_command_on_selected_server(open_shell)
 
 
 @task
