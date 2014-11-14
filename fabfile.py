@@ -127,16 +127,16 @@ def run_command_on_selected_server(command):
 
 
 def _install_django_requirements():
-    with settings(prompts={'Do you want to continue [Y/n]? ': 'Y'}):
-        sudo('apt-get update')
-        sudo('apt-get upgrade')
-        sudo('apt-get install python-pip')
-        sudo('apt-get install python-dev')
-        sudo('apt-get install postgresql-server-dev-9.3')
-        sudo('apt-get install git')
+    sudo('apt-get update')
+    sudo('apt-get -y upgrade')
+    sudo('apt-get -y install python-pip')
+    sudo('apt-get -y install python-dev')
+    sudo('apt-get -y install postgresql-server-dev-9.3')
+    sudo('apt-get -y install git')
 
     if not fabric.contrib.files.exists('~/django-imagr/', use_sudo=True):
-        sudo('git clone https://github.com/miracode/django-imagr.git')
+        with settings(warn_only=True):
+            sudo('git clone https://github.com/miracode/django-imagr.git')
     with cd('django-imagr'):
         sudo('pip install -r requirements.txt')
 
@@ -174,6 +174,32 @@ def terminate_instance():
     conn = get_ec2_connection()
     conn.terminate_instances(instance_ids=[env.active_instance.id])
 
+
+@task
+def release_address():
+    conn = get_ec2_connection()
+    prompt_text = "Please select from the following addresses:\n"
+    address_template = " %(ct)d: %(id)s\n"
+    addresses = conn.get_all_addresses()
+    for idx, address in enumerate(addresses):
+        ct = idx + 1
+        args = {'ct': ct, 'id': str(address)}
+        prompt_text += address_template % args
+    prompt_text += "Choose an address: "
+
+    def validation(input):
+        choice = int(input)
+        if not choice in range(1, len(addresses) + 1):
+            raise ValueError("%d is not a valid instance" % choice)
+        return choice
+
+    choice = prompt(prompt_text, validate=validation)
+    addresses[choice - 1].release()
+
+
+@task
+def list_addresses():
+    pass
 
 ### Dan's stuff down here for ref.
 # from fabric.api import local
