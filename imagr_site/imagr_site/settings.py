@@ -24,7 +24,7 @@ DEBUG = False
 
 TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = ['imagr-site.jasonbrokaw.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
