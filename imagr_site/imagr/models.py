@@ -68,11 +68,13 @@ class Album(models.Model):
     def __unicode__(self):
         return self.title
 
-    now = timezone.now()
+    # this refreshes the database each time if we default=now
+    # now = timezone.now()
+    date = datetime.date(2014, 11, 1)
 
     title = models.CharField(max_length=140)
     description = models.CharField(max_length=2000, blank=True, null=True)
-    date_created = models.DateTimeField('date created', default=now)
+    date_created = models.DateTimeField('date created', default=date)
     date_modified = models.DateTimeField('date modified', blank=True,
                                          null=True)
     date_published = models.DateTimeField('date published', blank=True,
