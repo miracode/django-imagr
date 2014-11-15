@@ -9,7 +9,7 @@ import boto.ec2
 
 env.hosts = ['localhost', ]
 env["user"] = "ubuntu"
-env["key_filename"] = "~/.ssh/fabric.pem"
+env["key_filename"] = "~/.ssh/pk-aws.pem"
 env.aws_region = 'us-west-2'
 
 
@@ -37,7 +37,7 @@ def provision_instance(wait_for_running=False, timeout=60,
     timeout_val = int(timeout)
     conn = get_ec2_connection()
     instance_type = 't2.micro'
-    key_name = 'fabric'
+    key_name = 'mykeypair'
     security_group = 'ssh-access'
     image_id = "ami-3d50120d"
     # subnet_id = create_network()  # Probably don't want to do this each time
@@ -157,16 +157,16 @@ def _setup_database():
 def _start_server():
     secrets_file_name = \
         raw_input("Enter the name & path for the secrets.sh file: ")
-    env.secrets_file = put(secrets_file_name, '/etc/profile.d/')[0]
+    env.secrets_file = put(secrets_file_name, '.')[0]
     boto_file_name = raw_input("Enter the name & path for the .boto file: ")
     if not fabric.contrib.files.exists('~/.boto'):
         boto_file_name = put(boto_file_name, '.')[0]
+    if not fabric.contrib.files.exists('~/.boto'):
         sudo('mv %s ~/.boto' % boto_file_name)
     sudo('chmod 400 .boto')
-    run('source ' + env.secrets_file)
     with cd('django-imagr/imagr_site'):
-        sudo('python manage.py migrate')
-        sudo('source %s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application'
+        sudo('source ../../%s && python manage.py migrate' % env.secrets_file)
+        sudo('source ../../%s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application'
              % env.secrets_file)
 
 
