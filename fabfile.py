@@ -175,8 +175,12 @@ def _refresh_django_app():
     secrets_file_name = \
         raw_input("Enter the name & path for the secrets.sh file: ")
     env.secrets_file = put(secrets_file_name, '.')[0]
-    with cd('~django-imagr/imagr_site'):
+    with cd('~/django-imagr/imagr_site'):
         sudo('source ../../%s && python manage.py migrate' % env.secrets_file)
+    run('ps -a|grep gunicorn')
+    masterpid = raw_input("Enter gunicorn master PID number: ")
+    sudo('kill -s HUP %s' %masterpid)
+    print "Gunicorn restarted"
 
 def _install_nginx():
     sudo('apt-get install nginx')
