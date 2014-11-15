@@ -33,7 +33,7 @@ class UploadPhotoForm(ModelForm):
 
         photo = Photo(title=title, description=description,
                       date_uploaded=now, published=published, owner=owner,
-                      file_size=file_size)
+                      file_size=file_size, date_published=now)
         photo.save()
 
         albums = Album.objects.filter(id__in=album_ids)
