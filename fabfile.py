@@ -172,7 +172,11 @@ def _start_server():
 def _refresh_django_app():
     with cd('~/django-imagr'):
         sudo('git pull origin master')
-
+    secrets_file_name = \
+        raw_input("Enter the name & path for the secrets.sh file: ")
+    env.secrets_file = put(secrets_file_name, '.')[0]
+    with cd('~django-imagr/imagr_site'):
+        sudo('source ../../%s && python manage.py migrate' % env.secrets_file)
 
 def _install_nginx():
     sudo('apt-get install nginx')
@@ -182,7 +186,6 @@ def _install_nginx():
 @task
 def refresh_django_app():
     run_command_on_selected_server(_refresh_django_app)
-    run_command_on_selected_server(_start_server)
 
 @task
 def install_django_imagr():
