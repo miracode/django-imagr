@@ -169,11 +169,20 @@ def _start_server():
         sudo('source ../../%s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application'
              % env.secrets_file)
 
+def _refresh_django_app():
+    with cd('~/django-imagr'):
+        sudo('git pull origin master')
+
 
 def _install_nginx():
     sudo('apt-get install nginx')
     sudo('/etc/init.d/nginx start')
 
+
+@task
+def refresh_django_app():
+    run_command_on_selected_server(_refresh_django_app)
+    run_command_on_selected_server(_start_server)
 
 @task
 def install_django_imagr():
