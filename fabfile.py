@@ -172,10 +172,6 @@ def _start_server():
 def _refresh_django_app():
     with cd('~/django-imagr'):
         sudo('git pull origin master')
-    with cd('~/django-imagr/imagr_site'):
-        sudo('source ../../%s && python manage.py migrate' % env.secrets_file)
-        sudo('source ../../%s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application'
-             % env.secrets_file)
 
 
 def _install_nginx():
