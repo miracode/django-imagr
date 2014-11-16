@@ -10,7 +10,7 @@
 <body>
     <div id="header">
     {% block header %}
-    (<a href="{% url 'home' %}">{% trans "Home" %}</a> | 
+    <a href="{% url 'home' %}">{% trans "Home" %}</a> | 
     <a href="{% url 'stream' %}">{% trans "Stream" %}</a> | 
     <a href="{% url 'upload_photo' %}">{% trans "Upload Photo" %}</a> | 
     <a href="{% url 'create_album' %}">{% trans "Create Album" %}</a> | 
@@ -19,7 +19,8 @@
         (<a href="{% url 'auth_logout' %}">{% trans "Log out" %}</a> | 
         <a href="{% url 'auth_password_change' %}">{% trans "Change password" %}</a>)
     {% else %}
-       <a href="{% url 'auth_login' %}">{% trans "Log in" %}</a>
+       (<a href="{% url 'auth_login' %}">{% trans "Log in" %}</a> |
+       <a href="{% url 'registration_register' %}">{% trans "Register" %}</a>)
     {% endif %}
     <hr />
     {% endblock %}
