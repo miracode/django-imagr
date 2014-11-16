@@ -178,18 +178,9 @@ def _start_server():
     sudo('/etc/init.d/nginx start')
     with cd('django-imagr/imagr_site'):
         sudo('source ~/secrets.sh && python manage.py migrate')
+        sudo('source ~/secrets.sh && python manage.py collectstatic')
         sudo('source ~/secrets.sh && gunicorn -D -b 127.0.0.1:8888' +
              ' imagr_site.wsgi:application')
-
-
-def _collect_static():
-    with cd('django-imagr/imagr_site'):
-        sudo('source ~/secrets.sh && python manage.py collectstatic')
-
-
-@task
-def collect_static():
-    run_command_on_selected_server(_collect_static)
 
 
 def _refresh_django_app():
@@ -203,7 +194,9 @@ def _refresh_django_app():
 
 
 def _create_superuser():
+    _get_secrets()
     with cd('django-imagr/imagr_site'):
+        sudo('source ~/secrets.sh && python manage.py migrate')
         sudo('source ~/secrets.sh && python manage.py createsuperuser')
 
 
