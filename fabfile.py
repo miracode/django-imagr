@@ -138,7 +138,7 @@ def _install_imagr_requirements():
 
     if not fabric.contrib.files.exists('~/django-imagr/'):
         with settings(warn_only=True):
-            sudo('git clone https://github.com/jbbrokaw/django-imagr.git')
+            sudo('git clone https://github.com/miracode/django-imagr.git')
     sudo('ln -s /home/ubuntu/django-imagr/nginx.conf ' +
          '/etc/nginx/sites-enabled/amazonaws.com')
     with cd('django-imagr'):
