@@ -107,7 +107,8 @@ class AlbumForm(forms.ModelForm):
         for photo in photos:
             album.photos.add(photo)
 
-        album.photos.add(cover_photo)
+        if cover_photo is not None:
+            album.photos.add(cover_photo)
 
 
 class FollowForm(forms.ModelForm):

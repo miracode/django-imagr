@@ -84,5 +84,5 @@ class Album(models.Model):
     cover_photo = models.ForeignKey(Photo, related_name="cover_photo",
                                     blank=True, null=True)
     photos = models.ManyToManyField(Photo, verbose_name="photos in album",
-                                    blank=True,
+                                    blank=True, null=True
                                     )
