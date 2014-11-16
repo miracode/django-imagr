@@ -9,7 +9,7 @@ import boto.ec2
 
 env.hosts = ['localhost', ]
 env["user"] = "ubuntu"
-env["key_filename"] = "~/.ssh/pk-aws.pem"
+env["key_filename"] = "~/.ssh/fabric.pem"  # Update to user
 env.aws_region = 'us-west-2'
 
 
@@ -37,7 +37,7 @@ def provision_instance(wait_for_running=False, timeout=60,
     timeout_val = int(timeout)
     conn = get_ec2_connection()
     instance_type = 't2.micro'
-    key_name = 'mykeypair'
+    key_name = 'fabric'
     security_group = 'ssh-access'
     image_id = "ami-3d50120d"
     # subnet_id = create_network()  # Probably don't want to do this each time
@@ -134,12 +134,16 @@ def _install_imagr_requirements():
     sudo('apt-get -y install postgresql-9.3')
     sudo('apt-get -y install postgresql-server-dev-9.3')
     sudo('apt-get -y install git')
+    sudo('apt-get -y install nginx')
 
     if not fabric.contrib.files.exists('~/django-imagr/'):
         with settings(warn_only=True):
             sudo('git clone https://github.com/miracode/django-imagr.git')
+    sudo('ln -s /home/ubuntu/django-imagr/nginx.conf ' +
+         '/etc/nginx/sites-enabled/amazonaws.com')
     with cd('django-imagr'):
         sudo('pip install -r requirements.txt')
+    sudo('shutdown -r now')
 
 
 def _setup_database():
@@ -154,33 +158,47 @@ def _setup_database():
     sudo('psql -U postgres imagr -c %s' % create_user_command, user='postgres')
 
 
-def _start_server():
-    secrets_file_name = \
-        raw_input("Enter the name & path for the secrets.sh file: ")
-    env.secrets_file = put(secrets_file_name, '.')[0]
-    boto_file_name = raw_input("Enter the name & path for the .boto file: ")
+def _get_secrets():
+    if not fabric.contrib.files.exists('~/secrets.sh'):
+        secrets_file_name = \
+            raw_input("Enter the name & path of the secrets.sh file: ")
+        secrets_file_name = put(secrets_file_name, '.')[0]
+        if not fabric.contrib.files.exists('~/secrets.sh'):
+            sudo('mv %s ~/secrets.sh' % secrets_file_name)
     if not fabric.contrib.files.exists('~/.boto'):
+        boto_file_name = raw_input("Enter the name & path of the .boto file: ")
         boto_file_name = put(boto_file_name, '.')[0]
-    if not fabric.contrib.files.exists('~/.boto'):
-        sudo('mv %s ~/.boto' % boto_file_name)
-    sudo('chmod 400 .boto')
+        if not fabric.contrib.files.exists('~/.boto'):
+            sudo('mv %s ~/.boto' % boto_file_name)
+        sudo('chmod 400 ~/.boto')
+
+
+def _start_server():
+    _get_secrets()
+    sudo('/etc/init.d/nginx restart')
     with cd('django-imagr/imagr_site'):
-        sudo('source ../../%s && python manage.py migrate' % env.secrets_file)
-        sudo('source ../../%s && gunicorn -b 0.0.0.0:80 imagr_site.wsgi:application'
-             % env.secrets_file)
+        sudo('source ~/secrets.sh && python manage.py migrate')
+        sudo('source ~/secrets.sh && python manage.py collectstatic')
+        sudo('source ~/secrets.sh && gunicorn -D -b 127.0.0.1:8888' +
+             ' imagr_site.wsgi:application')
+
 
 def _refresh_django_app():
-    with cd('~/django-imagr'):
-        sudo('git pull origin master')
-    secrets_file_name = \
-        raw_input("Enter the name & path for the secrets.sh file: ")
-    env.secrets_file = put(secrets_file_name, '.')[0]
+    _get_secrets()
     with cd('~/django-imagr/imagr_site'):
-        sudo('source ../../%s && python manage.py migrate' % env.secrets_file)
+        sudo('source ~/secrets.sh && python manage.py migrate')
     run('ps -a|grep gunicorn')
     masterpid = raw_input("Enter gunicorn master PID number: ")
-    sudo('kill -s HUP %s' %masterpid)
+    sudo('kill -s HUP %s' % masterpid)
     print "Gunicorn restarted"
+
+
+def _create_superuser():
+    _get_secrets()
+    with cd('django-imagr/imagr_site'):
+        sudo('source ~/secrets.sh && python manage.py migrate')
+        sudo('source ~/secrets.sh && python manage.py createsuperuser')
+
 
 def _install_nginx():
     sudo('apt-get install nginx')
@@ -190,6 +208,7 @@ def _install_nginx():
 @task
 def refresh_django_app():
     run_command_on_selected_server(_refresh_django_app)
+
 
 @task
 def install_django_imagr():
@@ -204,6 +223,11 @@ def setup_imagr_database():
 @task
 def start_server():
     run_command_on_selected_server(_start_server)
+
+
+@task
+def create_superuser():
+    run_command_on_selected_server(_create_superuser)
 
 
 @task
