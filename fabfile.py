@@ -175,7 +175,7 @@ def _get_secrets():
 
 def _start_server():
     _get_secrets()
-    sudo('/etc/init.d/nginx start')
+    sudo('/etc/init.d/nginx restart')
     with cd('django-imagr/imagr_site'):
         sudo('source ~/secrets.sh && python manage.py migrate')
         sudo('source ~/secrets.sh && python manage.py collectstatic')
