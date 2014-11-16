@@ -6,6 +6,8 @@ from django.views.generic.edit import FormView
 from django.utils import timezone
 import datetime
 from imagr.forms import UploadPhotoForm, AddPhotoForm, AlbumForm, FollowForm
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 
 def index(request):
@@ -48,6 +50,7 @@ class PhotoDetails(generic.DetailView):
     template_name = 'imagr/photo_details.html'
 
 
+@login_required()
 def stream(request):
     user = request.user
     our_recent_photos = Photo.objects.filter(
@@ -78,6 +81,10 @@ class UploadPhotoView(FormView):
         form.save()
         return redirect('/imagr/home/')
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(UploadPhotoView, self).dispatch(*args, **kwargs)
+
 
 class CreateAlbumView(FormView):
     template_name = 'imagr/create_album.html'
@@ -91,6 +98,10 @@ class CreateAlbumView(FormView):
     def form_valid(self, form):
         form.save()
         return redirect('/imagr/home/')
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(CreateAlbumView, self).dispatch(*args, **kwargs)
 
 
 class ProfileView(generic.DetailView, generic.edit.UpdateView):

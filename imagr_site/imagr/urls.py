@@ -61,7 +61,7 @@ urlpatterns = patterns(
         name='auth_password_reset_complete'),
     url(r'^password/reset/done/$',
         auth_views.password_reset_done,
-        name='auth_password_reset_done'),
+        name='password_reset_done'),
     url(r'^upload_photo/$',
         views.UploadPhotoView.as_view(), name='upload_photo'),
     url(r'^create_album/$',
