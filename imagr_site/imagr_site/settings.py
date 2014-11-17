@@ -88,6 +88,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+LOGIN_URL = '/imagr/login'
 
 AUTH_USER_MODEL = 'imagr.ImagrUser'
 

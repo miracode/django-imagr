@@ -179,7 +179,7 @@ def _start_server():
     with cd('django-imagr/imagr_site'):
         sudo('source ~/secrets.sh && python manage.py migrate')
         sudo('source ~/secrets.sh && python manage.py collectstatic')
-        sudo('source ~/secrets.sh && gunicorn -D -b 127.0.0.1:8888' +
+        sudo('source ~/secrets.sh && gunicorn -b 127.0.0.1:8888' +
              ' imagr_site.wsgi:application')
 
 
