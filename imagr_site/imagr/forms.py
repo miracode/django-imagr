@@ -90,7 +90,10 @@ class AlbumForm(forms.ModelForm):
 
         # Make these fields
         cover_photo_id = self.cleaned_data['cover_photo_field']
-        cover_photo = Photo.objects.get(id=cover_photo_id)
+        if cover_photo_id != '':
+            cover_photo = Photo.objects.get(id=cover_photo_id)
+        else:
+            cover_photo = None
         photo_ids = self.cleaned_data['photos_field']
 
         album = Album(title=title, description=description,
@@ -104,7 +107,8 @@ class AlbumForm(forms.ModelForm):
         for photo in photos:
             album.photos.add(photo)
 
-        album.photos.add(cover_photo)
+        if cover_photo is not None:
+            album.photos.add(cover_photo)
 
 
 class FollowForm(forms.ModelForm):

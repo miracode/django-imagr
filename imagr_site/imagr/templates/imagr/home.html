@@ -8,7 +8,9 @@
 {% for album in albums %}
   <li>
     <a href="{% url 'album' album.id %}">{{ album.title }}</a>
+    {% if album.cover_photo %}
     <img src="{% url 'photo' album.cover_photo.id %}" />
+    {% endif %}
   </li>
 {% endfor %}
 </ul>
