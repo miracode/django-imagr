@@ -1,7 +1,7 @@
-django-imagr
+Imagr
 ============
 
-Create an imagr application
+## Create an image sharing application with Django
 
 
 [![Travis](https://travis-ci.org/miracode/django-imagr.svg?branch=master)](https://travis-ci.org/miracode/django-imagr.svg?branch=master)
